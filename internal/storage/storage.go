@@ -13,6 +13,8 @@ type Config struct {
 type Storage struct {
 	Config   Config
 	Database *pgdb.Database
+
+	Banners BannerMapper
 }
 
 func NewStorage(ctx context.Context, cfg Config) (*Storage, error) {
@@ -25,5 +27,6 @@ func NewStorage(ctx context.Context, cfg Config) (*Storage, error) {
 		return nil, err
 	}
 	storage.Database = pgdb.NewDatabase(pool)
+	storage.Banners = BannerMapper{Storage: storage}
 	return storage, nil
 }
