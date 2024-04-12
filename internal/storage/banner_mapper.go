@@ -88,7 +88,7 @@ func (m *BannerMapper) InsertBanner(ctx context.Context, params BannerCreatePara
 }
 
 // TODO nil into feature content active
-func (m *BannerMapper) UpdateBanner(ctx context.Context, id int64, params BannerCreateParams) (*entities.Banner, error) {
+func (m *BannerMapper) UpdateBannerById(ctx context.Context, id int64, params BannerCreateParams) (*entities.Banner, error) {
 	q := sq.Update("banners").PlaceholderFormat(sq.Dollar)
 	if params.TagIds != nil {
 		q.Set("tag_ids", params.TagIds)
@@ -114,8 +114,21 @@ func (m *BannerMapper) UpdateBanner(ctx context.Context, id int64, params Banner
 	return &result[0], nil
 }
 
-func (m *BannerMapper) DeleteBanner(ctx context.Context, id int64) (*entities.Banner, error) {
+func (m *BannerMapper) DeleteBannerById(ctx context.Context, id int64) (*entities.Banner, error) {
 	result, err := m.executeQuery(ctx, sq.Delete("banners").
+		PlaceholderFormat(sq.Dollar).
+		Where(sq.Eq{"id": id}))
+	if err != nil {
+		return nil, err
+	}
+	if len(result) == 0 {
+		return nil, nil
+	}
+	return &result[0], nil
+}
+
+func (m *BannerMapper) FindBannerById(ctx context.Context, id int64) (*entities.Banner, error) {
+	result, err := m.executeQuery(ctx, sq.Select("*").From("banners").
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{"id": id}))
 	if err != nil {

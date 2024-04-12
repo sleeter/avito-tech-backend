@@ -80,8 +80,6 @@ func CreateBanner(ctx *gin.Context, r *core.Repository) error {
 	return nil
 }
 
-// TODO: how to define error 404 500
-// TODO: maybe create func FindBanner
 func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 	bannerId, err := strconv.ParseInt(ctx.Param("banner_id"), 10, 0)
 	if err != nil {
@@ -106,7 +104,7 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 		})
 		return nil
 	}
-	_, err = r.Actions.UpdateBanner(ctx, entities.Banner{
+	banner, err := r.Actions.UpdateBanner(ctx, entities.Banner{
 		ID:        bannerId,
 		TagIds:    Banner.TagIds,
 		FeatureId: Banner.FeatureId,
@@ -120,12 +118,14 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 		})
 		return nil
 	}
+	if banner == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{})
+		return nil
+	}
 	ctx.JSON(http.StatusOK, gin.H{})
 	return nil
 }
 
-// TODO: how to define error 404 500
-// TODO: maybe create func FindBanner
 func DeleteBanner(ctx *gin.Context, r *core.Repository) error {
 	bannerId, err := strconv.ParseInt(ctx.Param("banner_id"), 10, 0)
 	if err != nil {
@@ -136,12 +136,16 @@ func DeleteBanner(ctx *gin.Context, r *core.Repository) error {
 		})
 		return nil
 	}
-	_, err = r.Actions.DeleteBanner(ctx, bannerId)
+	banner, err := r.Actions.DeleteBanner(ctx, bannerId)
 	if err != nil {
 		slog.Debug("Error with deleting banner: %s", err)
 		ctx.JSON(http.StatusInternalServerError, json.InternalServerErrorResponse{
 			Error: err.Error(),
 		})
+		return nil
+	}
+	if banner == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{})
 		return nil
 	}
 	ctx.JSON(http.StatusNoContent, gin.H{})

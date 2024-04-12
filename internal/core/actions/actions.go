@@ -25,7 +25,14 @@ func (a *Actions) GetBanners(ctx context.Context, tagId int64, featureId int64, 
 }
 
 func (a *Actions) UpdateBanner(ctx context.Context, request entities.Banner) (*entities.Banner, error) {
-	return a.storage.Banners.UpdateBanner(ctx, request.ID, storage.BannerCreateParams{
+	banner, err := a.storage.Banners.FindBannerById(ctx, request.ID)
+	if err != nil {
+		return nil, err
+	}
+	if banner == nil {
+		return nil, nil
+	}
+	return a.storage.Banners.UpdateBannerById(ctx, request.ID, storage.BannerCreateParams{
 		TagIds:    request.TagIds,
 		FeatureId: request.FeatureId,
 		Content:   request.Content,
@@ -43,5 +50,11 @@ func (a *Actions) CreateBanner(ctx context.Context, request entities.Banner) (*e
 }
 
 func (a *Actions) DeleteBanner(ctx context.Context, id int64) (*entities.Banner, error) {
-	return a.storage.Banners.DeleteBanner(ctx, id)
+	banner, err := a.storage.Banners.FindBannerById(ctx, id)
+	if err != nil {
+		return nil, err
+	} else if banner == nil {
+		return nil, nil
+	}
+	return a.storage.Banners.DeleteBannerById(ctx, id)
 }
