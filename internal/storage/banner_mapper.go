@@ -47,10 +47,10 @@ func toBanner(rows pgx.Rows) (entities.Banner, error) {
 	return banner, nil
 }
 
-// TODO add tag or feature
-func (m *BannerMapper) GetAllBannersByTagOrFeature(ctx context.Context, tagId int64, featureId int64, limit uint64, offset uint64) ([]entities.Banner, error) {
+func (m *BannerMapper) GetAllBannersByTagAndOrFeature(ctx context.Context, tagId int64, featureId int64, limit uint64, offset uint64) ([]entities.Banner, error) {
 	return m.executeQuery(ctx, sq.Select("*").From("banners").
 		PlaceholderFormat(sq.Dollar).
+		Where(sq.And{sq.Eq{"tag_ids": tagId}, sq.Eq{"feature_id": featureId}}).
 		Limit(limit).Offset(offset))
 }
 
@@ -103,6 +103,7 @@ func (m *BannerMapper) UpdateBanner(ctx context.Context, id int64, params Banner
 		q.Set("is_active", params.IsActive)
 	}
 	q.Set("updated_at", time.Now())
+	q.Where(sq.Eq{"id": id})
 	result, err := m.executeQuery(ctx, q)
 	if err != nil {
 		return nil, err

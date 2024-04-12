@@ -2,6 +2,7 @@ package main
 
 import (
 	"avito-tech-backend/internal/core"
+	http_server "avito-tech-backend/internal/http-server"
 	"avito-tech-backend/internal/pkg/config"
 	"context"
 	"log"
@@ -22,10 +23,14 @@ func main() {
 		log.Fatalf("Failed to parse config: %s", err)
 	}
 
-	//TODO: init storage: pgx
+	repository, err := core.NewRepository(ctx, cfg)
+	if err != nil {
+		log.Fatalf("Init repository: %s", err)
+	}
+	app := http_server.New(repository)
 
-	//TODO: init router: gin
-
-	//TODO: run server
+	if err := app.Start(ctx); err != nil {
+		log.Fatalf(err.Error())
+	}
 
 }

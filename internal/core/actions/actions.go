@@ -16,12 +16,12 @@ func NewActions(storage *storage.Storage) *Actions {
 	}
 }
 
-func (a *Actions) GetBanner(ctx context.Context, tagId int64, featureId int64, useLastVersion bool) (*entities.Banner, error) {
+func (a *Actions) GetUserBanner(ctx context.Context, tagId int64, featureId int64, useLastVersion bool) (*entities.Banner, error) {
 	return a.storage.Banners.GetBannerByTagAndFeature(ctx, tagId, featureId, useLastVersion)
 }
 
 func (a *Actions) GetBanners(ctx context.Context, tagId int64, featureId int64, limit uint64, offset uint64) ([]entities.Banner, error) {
-	return a.storage.Banners.GetAllBannersByTagOrFeature(ctx, tagId, featureId, limit, offset)
+	return a.storage.Banners.GetAllBannersByTagAndOrFeature(ctx, tagId, featureId, limit, offset)
 }
 
 func (a *Actions) UpdateBanner(ctx context.Context, request entities.Banner) (*entities.Banner, error) {
