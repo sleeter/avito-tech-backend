@@ -3,7 +3,6 @@ package handlers
 import (
 	"avito-tech-backend/internal/core"
 	"avito-tech-backend/internal/core/entities"
-	"avito-tech-backend/internal/pkg/web/json"
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"net/http"
@@ -21,22 +20,18 @@ func GetUserBanner(ctx *gin.Context, r *core.Repository) error {
 	if err := ctx.BindQuery(&queryParams); err != nil {
 		slog.Debug("Error with getting user banner: %s", err)
 		//zap.L().Debug("Get user banner", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, json.BadRequestResponse{
-			Error: err.Error(),
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return nil
 	}
 	banner, err := r.Actions.GetUserBanner(ctx, queryParams.TagId, queryParams.FeatureId, queryParams.UseLastVersion)
 	if err != nil {
-		slog.Debug("Error with getting user banner: %s", err)
-		ctx.JSON(http.StatusInternalServerError, json.InternalServerErrorResponse{
-			Error: err.Error(),
-		})
-		return nil
+		return err
 	}
 	if banner == nil {
 		slog.Debug("Error with getting user banner: %s", err)
-		ctx.JSON(http.StatusNotFound, json.NotFoundResponse{})
+		ctx.Status(http.StatusNotFound)
 		return nil
 	}
 	ctx.JSON(http.StatusOK, gin.H{
@@ -55,8 +50,8 @@ func CreateBanner(ctx *gin.Context, r *core.Repository) error {
 	if err := ctx.BindJSON(&Banner); err != nil {
 		slog.Debug("Error with creating banner: %s", err)
 		//zap.L().Debug("Create courier", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, json.BadRequestResponse{
-			Error: err.Error(),
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return nil
 	}
@@ -68,11 +63,7 @@ func CreateBanner(ctx *gin.Context, r *core.Repository) error {
 		IsActive:  Banner.IsActive,
 	})
 	if err != nil {
-		slog.Debug("Error with creating banner: %s", err)
-		ctx.JSON(http.StatusInternalServerError, json.InternalServerErrorResponse{
-			Error: err.Error(),
-		})
-		return nil
+		return err
 	}
 	ctx.JSON(http.StatusCreated, gin.H{
 		"banner_id": banner.ID,
@@ -85,8 +76,8 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 	if err != nil {
 		slog.Debug("Error with updating banner: %s", err)
 		//zap.L().Debug("Update banner", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, json.BadRequestResponse{
-			Error: err.Error(),
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return nil
 	}
@@ -99,8 +90,8 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 	if err := ctx.BindJSON(&Banner); err != nil {
 		slog.Debug("Error with updating banner: %s", err)
 		//zap.L().Debug("Create courier", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, json.BadRequestResponse{
-			Error: err.Error(),
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return nil
 	}
@@ -112,14 +103,10 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 		IsActive:  Banner.IsActive,
 	})
 	if err != nil {
-		slog.Debug("Error with updating banner: %s", err)
-		ctx.JSON(http.StatusInternalServerError, json.InternalServerErrorResponse{
-			Error: err.Error(),
-		})
-		return nil
+		return err
 	}
 	if banner == nil {
-		ctx.JSON(http.StatusNotFound, gin.H{})
+		ctx.Status(http.StatusNotFound)
 		return nil
 	}
 	ctx.JSON(http.StatusOK, gin.H{})
@@ -131,24 +118,20 @@ func DeleteBanner(ctx *gin.Context, r *core.Repository) error {
 	if err != nil {
 		slog.Debug("Error with deleting banner: %s", err)
 		//zap.L().Debug("Delete banner", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, json.BadRequestResponse{
-			Error: err.Error(),
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return nil
 	}
 	banner, err := r.Actions.DeleteBanner(ctx, bannerId)
 	if err != nil {
-		slog.Debug("Error with deleting banner: %s", err)
-		ctx.JSON(http.StatusInternalServerError, json.InternalServerErrorResponse{
-			Error: err.Error(),
-		})
-		return nil
+		return err
 	}
 	if banner == nil {
-		ctx.JSON(http.StatusNotFound, gin.H{})
+		ctx.Status(http.StatusNotFound)
 		return nil
 	}
-	ctx.JSON(http.StatusNoContent, gin.H{})
+	ctx.Status(http.StatusNoContent)
 	return nil
 }
 
@@ -165,18 +148,14 @@ func GetBanners(ctx *gin.Context, r *core.Repository) error {
 	if err := ctx.BindQuery(&queryParams); err != nil {
 		slog.Debug("Error with getting banners: %s", err)
 		//zap.L().Debug("Get banner", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, json.BadRequestResponse{
-			Error: err.Error(),
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return nil
 	}
 	banners, err := r.Actions.GetBanners(ctx, queryParams.TagId, queryParams.FeatureId, queryParams.Limit, queryParams.Offset)
 	if err != nil {
-		slog.Debug("Error with getting banners: %s", err)
-		ctx.JSON(http.StatusInternalServerError, json.InternalServerErrorResponse{
-			Error: err.Error(),
-		})
-		return nil
+		return err
 	}
 	ctx.JSON(http.StatusOK, banners)
 	return nil

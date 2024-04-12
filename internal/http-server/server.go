@@ -27,6 +27,8 @@ func New(repository *core.Repository) *App {
 func (app *App) Start(ctx context.Context) error {
 	return app.Server.Run(ctx)
 }
+
+// TODO: up migrations and add middleware
 func (app *App) initRoutes() {
 	app.Router = gin.Default()
 
@@ -44,5 +46,27 @@ func (app *App) mappedHandler(handler func(*gin.Context, *core.Repository) error
 		if err := handler(ctx, app.Repository); err != nil {
 			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		}
+	}
+}
+
+func authAdminMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token := ctx.GetHeader("token")
+		if token == "" {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+		}
+		if token != "admin_token" {
+			ctx.AbortWithStatus(http.StatusForbidden)
+		}
+		ctx.Next()
+	}
+}
+func authMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token := ctx.GetHeader("token")
+		if token == "" {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+		}
+		ctx.Next()
 	}
 }

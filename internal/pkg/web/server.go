@@ -10,7 +10,7 @@ import (
 
 // ServerConfig represents configuration for Server.
 type ServerConfig struct {
-	Address           string        `yaml:"address" env-default:"localhost:8080"`
+	Listen            string        `config:"listen"`
 	DrainInterval     time.Duration `yaml:"drainInterval"`
 	Profile           bool          `yaml:"profile"`
 	ReadTimeout       time.Duration `yaml:"readTimeout"`
@@ -48,7 +48,7 @@ func NewServer(config ServerConfig, handler *gin.Engine) *BaseServer {
 	}
 
 	s.httpServer = &http.Server{
-		Addr:              config.Address,
+		Addr:              config.Listen,
 		Handler:           s.engine.Handler(),
 		ReadTimeout:       config.ReadTimeout,
 		ReadHeaderTimeout: config.ReadHeaderTimeout,
