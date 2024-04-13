@@ -24,7 +24,7 @@ func (a *Actions) GetBanners(ctx context.Context, tagId int64, featureId int64, 
 	return a.storage.Banners.GetAllBannersByTagAndOrFeature(ctx, tagId, featureId, limit, offset)
 }
 
-func (a *Actions) UpdateBanner(ctx context.Context, request entities.Banner) (*entities.Banner, error) {
+func (a *Actions) UpdateBanner(ctx context.Context, request entities.RawBanner) (*entities.Banner, error) {
 	banner, err := a.storage.Banners.FindBannerById(ctx, request.ID)
 	if err != nil {
 		return nil, err
@@ -32,12 +32,7 @@ func (a *Actions) UpdateBanner(ctx context.Context, request entities.Banner) (*e
 	if banner == nil {
 		return nil, nil
 	}
-	return a.storage.Banners.UpdateBannerById(ctx, request.ID, storage.BannerCreateParams{
-		TagIds:    request.TagIds,
-		FeatureId: request.FeatureId,
-		Content:   request.Content,
-		IsActive:  request.IsActive,
-	})
+	return a.storage.Banners.UpdateBannerById(ctx, request.ID, request)
 }
 
 func (a *Actions) CreateBanner(ctx context.Context, request entities.Banner) (*entities.Banner, error) {

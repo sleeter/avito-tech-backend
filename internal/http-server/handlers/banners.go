@@ -82,10 +82,10 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 		return nil
 	}
 	var Banner struct {
-		TagIds    []int64 `json:"tag_ids"`
-		FeatureId int64   `json:"feature_id"`
-		Content   string  `json:"content"`
-		IsActive  bool    `json:"is_active"`
+		TagIds    string `json:"tag_ids"`
+		FeatureId string `json:"feature_id"`
+		Content   string `json:"content"`
+		IsActive  string `json:"is_active"`
 	}
 	if err := ctx.BindJSON(&Banner); err != nil {
 		slog.Debug("Error with updating banner: %s", err)
@@ -95,9 +95,26 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 		})
 		return nil
 	}
-	banner, err := r.Actions.UpdateBanner(ctx, entities.Banner{
+	if Banner.TagIds == "null" && Banner.FeatureId == "null" && Banner.Content == "null" && Banner.IsActive == "null" {
+		slog.Debug("Error with updating banner: you must pass at least one parameter")
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Error with updating banner: you must pass at least one parameter",
+		})
+		return nil
+	}
+	var TagIdsStruct struct {
+		TagIds []int64 `json:"tag_ids"`
+	}
+	if Banner.TagIds != "null" {
+		if err := ctx.BindJSON(&TagIdsStruct); err != nil {
+
+		}
+	} else {
+		TagIdsStruct.TagIds = nil
+	}
+	banner, err := r.Actions.UpdateBanner(ctx, entities.RawBanner{
 		ID:        bannerId,
-		TagIds:    Banner.TagIds,
+		TagIds:    TagIdsStruct.TagIds,
 		FeatureId: Banner.FeatureId,
 		Content:   Banner.Content,
 		IsActive:  Banner.IsActive,

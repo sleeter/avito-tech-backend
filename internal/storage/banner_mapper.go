@@ -5,6 +5,7 @@ import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
+	"strconv"
 	"time"
 )
 
@@ -58,10 +59,12 @@ func (m *BannerMapper) GetBannerByTagAndFeature(ctx context.Context, featureId i
 	q := sq.Select("*").From("banners").
 		PlaceholderFormat(sq.Dollar)
 	if useLastVersion {
-		q.Where(sq.And{sq.Eq{"feature_id": featureId}, sq.Eq{"tag_ids": tagId}, sq.GtOrEq{"updated_at": time.Now().Add(-time.Minute * 5)}})
+		q.Where(sq.And{sq.Eq{"feature_id": featureId}, sq.Eq{"tag_ids": tagId}, sq.GtOrEq{"updated_at": time.Now().Add(-time.Minute * 5)}}).
+			OrderBy("updated_at DESC").Limit(1)
 	} else {
 		q.Where(sq.And{sq.Eq{"feature_id": featureId}, sq.Eq{"tag_ids": tagId}})
 	}
+	q.Where(sq.Eq{"is_active": true})
 	result, err := m.executeQuery(ctx, q)
 	if err != nil {
 		return nil, err
@@ -87,20 +90,27 @@ func (m *BannerMapper) InsertBanner(ctx context.Context, params BannerCreatePara
 	return &result[0], nil
 }
 
-// TODO nil into feature content active
-func (m *BannerMapper) UpdateBannerById(ctx context.Context, id int64, params BannerCreateParams) (*entities.Banner, error) {
+func (m *BannerMapper) UpdateBannerById(ctx context.Context, id int64, params entities.RawBanner) (*entities.Banner, error) {
 	q := sq.Update("banners").PlaceholderFormat(sq.Dollar)
 	if params.TagIds != nil {
 		q.Set("tag_ids", params.TagIds)
 	}
-	if params.FeatureId != nil {
-		q.Set("feature_id", params.FeatureId)
+	if params.FeatureId != "null" {
+		featureId, err := strconv.ParseInt(params.FeatureId, 10, 0)
+		if err != nil {
+			return nil, err
+		}
+		q.Set("feature_id", featureId)
 	}
-	if params.Content != nil {
+	if params.Content != "null" {
 		q.Set("content", params.Content)
 	}
-	if params.IsActive != nil {
-		q.Set("is_active", params.IsActive)
+	if params.IsActive != "null" {
+		isActive, err := strconv.ParseBool(params.IsActive)
+		if err != nil {
+			return nil, err
+		}
+		q.Set("is_active", isActive)
 	}
 	q.Set("updated_at", time.Now())
 	q.Where(sq.Eq{"id": id})

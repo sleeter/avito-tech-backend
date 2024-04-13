@@ -11,3 +11,10 @@ type Banner struct {
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 }
+type RawBanner struct {
+	ID        int64   `json:"banner_id"`
+	TagIds    []int64 `json:"tag_ids"`
+	FeatureId string  `json:"feature_id"`
+	Content   string  `json:"content"`
+	IsActive  string  `json:"is_active"`
+}

@@ -60,6 +60,16 @@ func NewServer(config ServerConfig, handler *gin.Engine) *BaseServer {
 }
 
 func (s *BaseServer) Run(ctx context.Context) error {
+	s.Router().GET("/live", func(_ *gin.Context) {})
+	s.Router().GET("/ping", s.getPing)
+
+	go func() {
+		for {
+			<-ctx.Done()
+			return
+		}
+	}()
+
 	return s.httpServer.ListenAndServe()
 }
 
@@ -76,4 +86,12 @@ func (s *BaseServer) Router() gin.IRouter {
 
 func (s *BaseServer) Ready() bool {
 	return atomic.LoadInt32(&s.isNotReady) == 0
+}
+
+func (s *BaseServer) getPing(ctx *gin.Context) {
+	if s.Ready() {
+		_, _ = ctx.Writer.Write([]byte("pong"))
+	} else {
+		http.Error(ctx.Writer, "server cannot accept requests", http.StatusTeapot)
+	}
 }
