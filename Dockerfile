@@ -9,6 +9,6 @@ RUN go mod download && go mod verify
 COPY . .
 
 RUN mkdir -p /usr/local/bin/
-RUN go build -v -o /usr/local/bin/app ./cmd/server/main.go
+RUN go build -v -o /usr/local/bin/app ./cmd/banners/main.go
 
 CMD ["app"]
