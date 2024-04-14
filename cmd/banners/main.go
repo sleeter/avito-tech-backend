@@ -14,6 +14,9 @@ import (
 	"log/slog"
 	"os"
 	"time"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 func main() {
