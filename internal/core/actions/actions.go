@@ -48,7 +48,8 @@ func (a *Actions) DeleteBanner(ctx context.Context, id int64) (*entities.Banner,
 	banner, err := a.storage.Banners.FindBannerById(ctx, id)
 	if err != nil {
 		return nil, err
-	} else if banner == nil {
+	}
+	if banner == nil {
 		return nil, nil
 	}
 	return a.storage.Banners.DeleteBannerById(ctx, id)

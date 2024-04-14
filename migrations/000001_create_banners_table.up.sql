@@ -8,3 +8,5 @@ CREATE TABLE IF NOT EXISTS banners
     created_at  timestamp   NOT NULL,
     updated_at  timestamp   NOT NULL
 );
+
+CREATE INDEX idx_tags_ids ON banners USING gin(tag_ids)
