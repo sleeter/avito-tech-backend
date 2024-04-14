@@ -11,8 +11,8 @@ import (
 
 func GetUserBanner(ctx *gin.Context, r *core.Repository) error {
 	var queryParams = struct {
-		TagId          int64 `form:"tag_id"`
-		FeatureId      int64 `form:"feature_id"`
+		TagId          int64 `form:"tag_id" required:"true"`
+		FeatureId      int64 `form:"feature_id" required:"true"`
 		UseLastVersion bool  `form:"use_last_version"`
 	}{
 		UseLastVersion: false,
@@ -42,10 +42,10 @@ func GetUserBanner(ctx *gin.Context, r *core.Repository) error {
 
 func CreateBanner(ctx *gin.Context, r *core.Repository) error {
 	var Banner struct {
-		TagIds    []int64 `json:"tag_ids"`
-		FeatureId int64   `json:"feature_id"`
-		Content   string  `json:"content"`
-		IsActive  bool    `json:"is_active"`
+		TagIds    []int64 `json:"tag_ids" required:"true"`
+		FeatureId int64   `json:"feature_id" required:"true"`
+		Content   string  `json:"content" required:"true"`
+		IsActive  bool    `json:"is_active" required:"true"`
 	}
 	if err := ctx.BindJSON(&Banner); err != nil {
 		slog.Debug("Error with creating banner: %s", err)

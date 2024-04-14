@@ -149,3 +149,23 @@ func (m *BannerMapper) FindBannerById(ctx context.Context, id int64) (*entities.
 	}
 	return &result[0], nil
 }
+
+func (m *BannerMapper) FindBannerByTagIdAndFeatureIdAndUseLastVersion(ctx context.Context, tagId int64, featureId int64, useLastVersion bool) (*entities.Banner, error) {
+	q := sq.Select("*").From("banners").
+		PlaceholderFormat(sq.Dollar)
+	if useLastVersion {
+		q.Where(sq.And{sq.Eq{"feature_id": featureId}, sq.Eq{"tag_ids": tagId}, sq.GtOrEq{"updated_at": time.Now().Add(-time.Minute * 5)}}).
+			OrderBy("updated_at DESC").Limit(1)
+	} else {
+		q.Where(sq.And{sq.Eq{"feature_id": featureId}, sq.Eq{"tag_ids": tagId}})
+	}
+	q.Where(sq.Eq{"is_active": true})
+	result, err := m.executeQuery(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	if len(result) == 0 {
+		return nil, nil
+	}
+	return &result[0], nil
+}

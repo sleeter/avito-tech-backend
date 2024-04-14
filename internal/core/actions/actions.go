@@ -17,6 +17,13 @@ func NewActions(storage *storage.Storage) *Actions {
 }
 
 func (a *Actions) GetUserBanner(ctx context.Context, tagId int64, featureId int64, useLastVersion bool) (*entities.Banner, error) {
+	banner, err := a.storage.Banners.FindBannerByTagIdAndFeatureIdAndUseLastVersion(ctx, tagId, featureId, useLastVersion)
+	if err != nil {
+		return nil, err
+	}
+	if banner == nil {
+		return nil, nil
+	}
 	return a.storage.Banners.GetBannerByTagAndFeature(ctx, tagId, featureId, useLastVersion)
 }
 
