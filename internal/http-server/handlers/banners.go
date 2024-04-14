@@ -19,7 +19,6 @@ func GetUserBanner(ctx *gin.Context, r *core.Repository) error {
 	}
 	if err := ctx.BindQuery(&queryParams); err != nil {
 		slog.Debug("Error with getting user banner: %s", err)
-		//zap.L().Debug("Get user banner", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -49,7 +48,6 @@ func CreateBanner(ctx *gin.Context, r *core.Repository) error {
 	}
 	if err := ctx.BindJSON(&Banner); err != nil {
 		slog.Debug("Error with creating banner: %s", err)
-		//zap.L().Debug("Create courier", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -75,7 +73,6 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 	bannerId, err := strconv.ParseInt(ctx.Param("banner_id"), 10, 0)
 	if err != nil {
 		slog.Debug("Error with updating banner: %s", err)
-		//zap.L().Debug("Update banner", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -89,7 +86,6 @@ func UpdateBanner(ctx *gin.Context, r *core.Repository) error {
 	}
 	if err := ctx.BindJSON(&Banner); err != nil {
 		slog.Debug("Error with updating banner: %s", err)
-		//zap.L().Debug("Create courier", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -134,7 +130,6 @@ func DeleteBanner(ctx *gin.Context, r *core.Repository) error {
 	bannerId, err := strconv.ParseInt(ctx.Param("banner_id"), 10, 0)
 	if err != nil {
 		slog.Debug("Error with deleting banner: %s", err)
-		//zap.L().Debug("Delete banner", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -164,7 +159,6 @@ func GetBanners(ctx *gin.Context, r *core.Repository) error {
 	}
 	if err := ctx.BindQuery(&queryParams); err != nil {
 		slog.Debug("Error with getting banners: %s", err)
-		//zap.L().Debug("Get banner", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
