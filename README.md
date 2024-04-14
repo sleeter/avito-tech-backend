@@ -15,3 +15,6 @@
 
 Чтобы остановить сервис, выполните:
 ```make down```
+
+## Пример запроса
+![Post_example](https://github.com/sleeter/avito-tech-backend/raw/master/post_example.png)
